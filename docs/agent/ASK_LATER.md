@@ -40,3 +40,5 @@ probably don't apply to you. I left them **on** because switching them off chang
 - Other colleges: Texas Tech, Rice, UH, UNT
 - Narrow fields: AWS (welding), AIST (steel), Civil Air Patrol (cadets), IISE, NBAA
 Say "switch them off" and I'll set `enabled: false` on each (kept in config, not deleted), or name the ones to keep.
+**Partly answered 2026-11-24:** the user said not to drop too much; a later requirement check will fine-tune eligibility.
+All pages stay on for now.
