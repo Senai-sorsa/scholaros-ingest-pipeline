@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from pipeline.adapters.careeronestop import CareerOneStopAdapter
+from pipeline.adapters.collegescholarships import CollegeScholarshipsAdapter
 from pipeline.adapters.public_aggregators import BoldAdapter, NicheAdapter, UnigoAdapter
 from pipeline.adapters.watchlist import WatchlistAdapter
 from pipeline.compliance import CompliantHttpClient
@@ -27,6 +28,7 @@ ADAPTER_MAP = {
     "unigo": UnigoAdapter,
     "niche": NicheAdapter,
     "watchlist": WatchlistAdapter,
+    "collegescholarships": CollegeScholarshipsAdapter,
 }
 
 

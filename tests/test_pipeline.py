@@ -244,3 +244,73 @@ def test_watchlist_adapter_builds_record_and_skips_blocked():
     assert item.source_type == "Primary" and "closed" in item.review_notes
     accepted, _ = run(items)
     assert len(accepted) == 1 and len(accepted[0].to_sheet_row()) == 20
+
+
+# --- CollegeScholarships.org listing adapter (markup copied from the live listing page, 2026-11-24) ---
+from pipeline.adapters.collegescholarships import CollegeScholarshipsAdapter, parse_listing  # noqa: E402
+
+
+def _cs_row(slug, title, award, deadline, desc, state, level, major):
+    return f"""<div class="row"><div class="col-md-2"><div class="scholarship-summary">
+      <p><span class="small">Award</span><br/><span class="lead"><strong>{award}</strong></span></p>
+      <p><span class="small">Deadline</span><br/><strong>{deadline}</strong></p>
+      <a href="https://www.collegescholarships.org/financial-aid/scholarship/{slug}">More info</a></div></div>
+      <div class="col-md-10"><div class="scholarship-description">
+      <h4><a href="https://www.collegescholarships.org/financial-aid/scholarship/{slug}">{title}</a></h4>
+      <p class="visible-xs">Award: <strong>{award}</strong></p><p>{desc}</p>
+      <ul class="fa-ul"><li><i class="fa fa-li fa-map-marker"></i><span>{state}</span></li>
+      <li><i class="fa fa-li fa-graduation-cap"></i><span>{level}</span></li>
+      <li><i class="fa fa-li fa-book"></i><span>{major}</span></li></ul></div></div></div>"""
+
+
+CS_PAGE = "<html><body><a href='https://www.collegescholarships.org/financial-aid/?page=3'>3</a><div class='scholarship-list'>" + "".join([
+    _cs_row("aero", "Aero Award", "$2,500", "March 1", "Open to engineering undergraduates.", "No Geographic Restrictions", "College junior, College senior", "Aerospace Engineering"),
+    _cs_row("tx", "Texas Any Major", "-", "None", "Texas residents.", "Texas", "No Restrictions", "All Majors Eligible"),
+    _cs_row("women", "Women Award", "$1,000", "May 1", "Applicant must be female.", "No Geographic Restrictions", "College junior", "Engineering"),
+    _cs_row("mi", "Michigan Award", "$1,000", "May 1", "Michigan only.", "Michigan", "College junior", "All Majors Eligible"),
+    _cs_row("hs", "HS Award", "$1,000", "May 1", "Seniors.", "No Geographic Restrictions", "High school senior", "All Majors Eligible"),
+    _cs_row("nurse", "Nursing Award", "$1,000", "May 1", "Nurses.", "No Geographic Restrictions", "College junior", "Nursing"),
+    _cs_row("adams", "Rotary Award", "$1,000", "May 1", "Full-time.", "No Geographic Restrictions", "College junior", "All Majors Eligible"),
+]) + "</div></body></html>"
+CS_SPONSORS = {"aero": "Aero Foundation, Inc.", "tx": "Texas A&M University", "adams": "Adams State University"}
+
+
+def test_cs_parse_listing():
+    items = parse_listing(CS_PAGE)
+    assert len(items) == 7
+    assert items[0] == {"title": "Aero Award", "url": "https://www.collegescholarships.org/financial-aid/scholarship/aero",
+                        "award": "$2,500", "deadline": "March 1", "description": "Open to engineering undergraduates.",
+                        "state": "No Geographic Restrictions", "level": "College junior, College senior",
+                        "major": "Aerospace Engineering"}
+
+
+def test_cs_adapter_filters_profile_and_visits_every_page_once():
+    import yaml
+    cfg = yaml.safe_load(open("config.yaml", encoding="utf-8"))["sources"]["collegescholarships"]
+    visited = []
+
+    def handler(request):
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if "/scholarship/" in request.url.path:
+            slug = request.url.path.rsplit("/", 1)[1]
+            details.append(slug)
+            return httpx.Response(200, text=f"<div class='sponsor'><h4>Sponsor Information</h4><p><strong>{CS_SPONSORS[slug]}</strong></p></div>")
+        visited.append(request.url.params.get("page", "1"))
+        return httpx.Response(200, text=CS_PAGE)
+
+    details = []
+    items = CollegeScholarshipsAdapter(client=_client(handler), config=cfg).fetch()
+    assert sorted(visited) == ["1", "2", "3"]  # page count read from the pagination links; capped by total
+    assert sorted(set(details)) == ["adams", "aero", "tx"]  # detail pages only for listing matches
+    assert {i.title for i in items} == {"Aero Award", "Texas Any Major"}  # Adams State's own award dropped by sponsor
+    aero = next(i for i in items if i.title == "Aero Award")
+    assert (aero.award_min_usd, aero.award_max_usd, aero.source_type, aero.sponsor) == (2500, 2500, "Aggregator", "Aero Foundation, Inc.")
+    details.clear()
+    CollegeScholarshipsAdapter(client=_client(handler), config=dict(cfg, max_detail_fetches_per_run=2)).fetch()
+    assert details == ["aero", "tx"]  # stops once the detail budget is spent
+    assert aero.deadline_utc_iso.endswith("-03-01T23:59:00Z")
+    tx = next(i for i in items if i.title == "Texas Any Major")
+    assert (tx.award_max_usd, tx.deadline_utc_iso, tx.competition_scope) == (None, "", "State")
+    accepted, _ = run(items)
+    assert len(accepted) == 2 and len(accepted[0].to_sheet_row()) == 20  # same URL on each page is deduped

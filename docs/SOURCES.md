@@ -33,6 +33,18 @@ All checks below were made on **2026-11-24**. Re-check before re-enabling anythi
 | AIST Foundation | National | Round 4. No terms anywhere on aist.org (homepage footer checked) |
 | Civil Air Patrol | National | Round 4. `legal-privacy-statement` has no access/copy clause. Cadets only |
 
+## Included: large aggregator (`sources.collegescholarships` in `config.yaml`)
+| Source | Notes |
+|---|---|
+| CollegeScholarships.org | ~23k awards (769 listing pages × 30). robots.txt disallows only `?q=`, `?s=`, `p=`, feeds and WP admin, so `/financial-aid/?page=N` and `/financial-aid/scholarship/<slug>` are allowed. **No Terms of Use anywhere:** the footer links only About and Privacy, `/terms.htm` and `/terms-of-use` are 404, and `privacy.htm` has no access/copy clause. The search filters are a POST form with a CSRF token, so the adapter does not use them. It reads the plain GET listing pages and filters locally. |
+
+## Large aggregators checked 2026-11-24 (user asked for big multi-scholarship sites)
+| Site | Verdict |
+|---|---|
+| BigFuture / College Board | **Excluded.** `about.collegeboard.org/site-terms`: "You may not ... scrape or data-mine College Board Services or Content", plus a general reproduction ban |
+| Petersons | **Excluded.** `petersons.com/terms-of-use`: the license "does not include use of any data mining, robots ('bots') or similar data gather or extraction methods" |
+| scholarshipsandgrants.us | Legal (robots allows all; privacy policy only, no terms). **Low value:** editorial blog lists, and its listing pages are mostly women/demographic-specific. Not added |
+
 ## Excluded: terms prohibit automated access
 Dell Scholars, RodeoHouston, Austin Community Foundation, Dallas Foundation, Appily, Scholarships360,
 CollegeXpress, AccessScholarships, Scholarship America, Sallie Mae, Raise.me, SmarterSelect, HSF,
@@ -55,8 +67,7 @@ Bold, Unigo and Niche can only be added with written permission. See `docs/PERMI
 ## Unresolved (could not verify; not added)
 | Source | Why |
 |---|---|
-| SAE, IEEE, Petersons, CollegeScholarships.org, Kaleidoscope | Terms page could not be read |
-| BigFuture (College Board) | No terms found at the expected location; needs a manual check |
+| SAE, IEEE, Kaleidoscope | Terms page could not be read |
 | GoingMerry | DNS failure |
 | SMART (DoD) | JavaScript-only page, no static content |
 | SPIE | JavaScript-only page |

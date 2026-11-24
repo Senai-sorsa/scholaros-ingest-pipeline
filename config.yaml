@@ -171,6 +171,21 @@ sources:
         sponsor: "Civil Air Patrol"
         url: "https://www.gocivilairpatrol.com/programs/cadets/cadetinvest/scholarships"
         tags: [aviation, aerospace_engineering, flight_training, cap_cadets]
+  # CollegeScholarships.org: large database (~23k awards). Checked 2026-11-24: robots.txt allows the listing pages
+  # and the site has no Terms of Use (privacy policy only). Reads listing pages (30 awards each), rotating through
+  # the whole database every few weeks, and keeps only awards matching the profile below. See docs/SOURCES.md.
+  collegescholarships:
+    enabled: true
+    max_pages_per_run: 60           # up to ~1,800 awards read per run; rotates so the whole database is covered over time
+    max_detail_fetches_per_run: 200 # one detail page per profile match (for the sponsor); bounds run time to ~15 min
+    sponsor_exclude_regex: '(?<!texas a&m )universit|college|institute of technology|\bschool\b'
+    allowed_states_regex: "no geographic restrictions|texas|college station|bryan"
+    allowed_levels_regex: "no restrictions|college (?:sophomore|junior|senior)"
+    allowed_majors_regex: 'all majors|engineer|aero|aviation|avionics|physics|mathemat|\bstem\b'
+    # Profile: male undergraduate at Texas A&M. Drop women-only awards, other colleges' own awards (the listing
+    # has no sponsor name, but those use generic titles or ask for transfer/incoming students), and awards limited to
+    # a heritage, family/military tie, medical condition or membership the user doesn't have (user asked: general awards only).
+    exclude_regex: '\b(?:female|women|woman|girls?|daughters?|sororit)|transfer student|incoming freshm|entering freshm|^(?:presidential|chancellor|dean|trustee|alumni|athletic|honors program|department|academic (?:achievement|excellence)|national merit|merit|out-of-state|tuition)|\b(?:korean|chinese|japanese|filipino|vietnamese|armenian|greek|italian|polish|hispanic|latin[aox]|african|native|hawaiian|jewish)[- ]american|child or grandchild|(?:children|dependents?|descendants?|spouses?) of|\bveterans?\b|servicemember|military (?:member|famil)|cystic fibrosis|disabilit|illness|cancer|golden key|must be (?:an? )?(?:active )?member'
   # CareerOneStop is not accepting new API registrations (as of 2026-11); skips itself without credentials.
   careeronestop:
     enabled: true

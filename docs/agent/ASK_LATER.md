@@ -31,3 +31,12 @@ The agent kept working on each item's stated assumption. Answer whenever conveni
 
 ## A-6: PAMA (personal-use-only terms)
 `pama.org/terms-of-use.html` lets you use content "solely for your personal use". This pipeline feeds your personal tracker, so it arguably qualifies, but I left PAMA out to be safe. PAMA's scholarship page currently shows "Deadline: December 15, 2026" (aviation maintenance). Say "add PAMA" if you're comfortable with it.
+
+## A-7: Switch off watchlist pages that don't fit you?
+You said you're a male Texas A&M student and don't want other-college or narrow/demographic sources. These watchlist pages
+probably don't apply to you. I left them **on** because switching them off changes what lands in your sheet:
+- Women-only: SWE, Women in Aviation Intl, Brooke Owens, Ninety-Nines
+- Demographic-specific: SHPE, AMAC, AISES, SASE, OBAP
+- Other colleges: Texas Tech, Rice, UH, UNT
+- Narrow fields: AWS (welding), AIST (steel), Civil Air Patrol (cadets), IISE, NBAA
+Say "switch them off" and I'll set `enabled: false` on each (kept in config, not deleted), or name the ones to keep.
