@@ -1,0 +1,61 @@
+compliance:
+  user_agent: "ScholarOS-IngestBot/1.0 (+personal-noncommercial-academic-tracker)"
+  min_delay_seconds: 2.5
+  max_delay_seconds: 5.0
+  timeout_seconds: 20
+  respect_robots_txt: true
+  abort_on_status_codes: [403, 429]
+
+sources:
+  careeronestop:
+    enabled: true
+    keywords:
+      - "aerospace engineering"
+      - "engineering undergraduate"
+      - "STEM merit"
+      - "Texas undergraduate"
+    study_level: "Bachelor's"
+    max_results_per_keyword: 25
+  # Aggregators below are DISABLED: Unigo's Terms of Use forbid "any automatic device, process or means"
+  # to access or copy the site; Bold.org (Vercel bot checkpoint, HTTP 429) and Niche (HTTP 403) actively block bots.
+  # Do not re-enable or add headless-browser workarounds without written permission from the site.
+  bold:
+    enabled: false
+    public_listing_urls:
+      - "https://bold.org/scholarships/by-major/engineering-scholarships/"
+      - "https://bold.org/scholarships/by-year/college/undergraduate-scholarships/"
+    max_items_per_url: 20
+  unigo:
+    enabled: false
+    public_listing_urls:
+      - "https://www.unigo.com/scholarships/by-major/engineering-scholarships"
+      - "https://www.unigo.com/scholarships/by-state/texas-scholarships"
+    max_items_per_url: 20
+  niche:
+    enabled: false
+    public_listing_urls:
+      - "https://www.niche.com/colleges/scholarships/?major=engineering"
+    max_items_per_url: 20
+
+filters:
+  reject_keywords:
+    - "no essay"
+    - "sweepstakes"
+    - "random drawing"
+    - "application fee"
+    - "pell grant required"
+    - "demonstrated financial need required"
+    - "financial need only"
+    - "graduate students only"
+    - "phd only"
+    - "doctoral only"
+    - "high school seniors only"
+    - "daca only"
+    - "veterans only"
+    - "military dependents only"
+  min_award_usd: 500
+  require_future_deadline: true
+
+sheets:
+  staging_tab: "Ingest_Staging"
+  catalog_tab: "Catalog_Scholarships"

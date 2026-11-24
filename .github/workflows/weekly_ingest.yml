@@ -1,0 +1,64 @@
+name: Weekly ScholarOS Ingest Pipeline
+
+on:
+  schedule:
+    # Runs every Sunday at 12:00 UTC (6:00 AM CST / 7:00 AM CDT)
+    # Gives a 1-2 hour buffer before the Sunday 8:00 AM CST Gemini /scholarshipsearch run
+    - cron: "0 12 * * 0"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run without writing to Google Sheets"
+        required: false
+        default: "false"
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scholaros-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests (blocks the sheet write if anything is broken)
+        run: |
+          pip install pytest
+          python -m pytest -q
+
+      - name: Run compliant scholarship ingest
+        env:
+          SCHOLAROS_SHEET_ID: ${{ secrets.SCHOLAROS_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+          CAREERONESTOP_API_TOKEN: ${{ secrets.CAREERONESTOP_API_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python ingest.py --all --dry-run --export-xlsx
+          else
+            python ingest.py --all --export-xlsx
+          fi
+
+      - name: Upload raw JSONL & Excel backup artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scholaros-ingest-backup-${{ github.run_number }}
+          path: output/
+          retention-days: 30
