@@ -67,6 +67,8 @@ class WatchlistAdapter(BaseAdapter):
     def fetch(self) -> list[StagedScholarship]:
         results: list[StagedScholarship] = []
         for page in self.config.get("pages", []) or []:
+            if page.get("enabled", True) is False:
+                continue  # switched off (e.g. terms changed); kept in config for the record
             url = (page.get("url") or "").strip()
             if not url or not page.get("title"):
                 logger.warning("[watchlist] Skipping entry missing title/url: %s", page)

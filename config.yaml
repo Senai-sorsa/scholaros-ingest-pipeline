@@ -44,6 +44,9 @@ sources:
         url: "https://www.aopa.org/training-and-safety/students/aopa-flight-training-scholarships"
         award: "$250 - $14,000"
         tags: [aviation, flight_training]
+        # Off 2026-11-24: aopa.org/terms-of-use bans copying/reproducing "any information ... obtained from the AOPA
+        # Websites" (same category as ASME/AIAA). Re-enable only with written permission. See docs/SOURCES.md.
+        enabled: false
       - title: "EAA Flight Training Scholarships"
         sponsor: "Experimental Aircraft Association"
         url: "https://www.eaa.org/eaa/learn-to-fly/Scholarships"

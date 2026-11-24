@@ -227,6 +227,7 @@ def test_watchlist_adapter_builds_record_and_skips_blocked():
         {"title": "VFF", "sponsor": "VFS", "url": "https://ok.org/vff", "award": "$4,000 - $6,000", "tags": ["aero"]},
         {"title": "Blocked", "url": "https://blocked.org/x"},
         {"title": "", "url": "https://ok.org/missing-title"},
+        {"title": "Off", "url": "https://ok.org/off", "enabled": False},
     ]
     items = WatchlistAdapter(client=_client(handler), config={"pages": pages}).fetch()
     assert len(items) == 1

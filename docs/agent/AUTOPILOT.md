@@ -29,7 +29,7 @@ until they say stop: find more legal scholarship sources, and extract more and b
 | SQ-5 | Per-source health report (fetched / blocked / no-deadline) in the run log | partial: rejection reasons now logged (E-5) |
 | SQ-6 | More audits: other Texas universities (UTSA, UTD, UNT, Texas State), more engineering/aero societies, federal programs (DoD SMART, NASA, NSF, DOE), community foundations | open |
 | SQ-7 | Split multi-scholarship pages into one row per named award (behind a per-page flag) | open |
-| SQ-8 | Keep a `check_source.py` health pass of every watchlist page; switch off pages that go 403 or change their terms | open |
+| SQ-8 | Keep a `check_source.py --terms` health pass of every watchlist page; switch off pages that go 403 or change their terms | tool done (E-7); repeat each session |
 
 ## Experiment log
 | ID | Date | Change | Test | Result | Kept? |
@@ -40,3 +40,5 @@ until they say stop: find more legal scholarship sources, and extract more and b
 | E-4 | 2026-11-24 | robots.txt requested with `Accept: text/plain` | Test fails without fix, passes with it; live: smeef.org/ttu.edu went 406 to 200 | Real robots rules now honoured on sites that 406'd | kept |
 | E-5 | 2026-11-24 | Log each rejected row with its reason | Live dry run: 6 rejections, all `expired_deadline` (last cycle closed: SHPE, AMAC, SFTE, SASE, UH, THECB) | Visible in the Actions log | kept |
 | E-6 | 2026-11-24 | Watchlist rows dedup by fingerprint only (`dedup_by_url=False`) | New test: next cycle passes, same cycle still a dup; 41 passed | Fixes: a fixed page's URL already in the sheet blocked every later cycle | kept |
+| E-7 | 2026-11-24 | `check_source.py --terms`: scans the terms/legal pages for robot/scrape/copy clauses | Ran on all 26 pages | Caught AOPA's general reproduction ban, missed in round 1 | kept |
+| E-8 | 2026-11-24 | Per-page `enabled: false` in the watchlist; AOPA switched off | Adapter test covers a disabled page; 41 passed | AOPA no longer fetched | kept |

@@ -6,7 +6,12 @@ Policy (see `CLAUDE.md` hard rule 2). A site is included only if **all** of thes
 - The terms have **no** general ban on copying/reproducing site content. A restriction scoped to other content (e.g. a journal library or store) is OK.
 - No terms at all is OK once that has been confirmed.
 
-Check robots/HTTP with `python scripts/check_source.py URL...`. Terms must still be read by a person or agent.
+Check robots/HTTP with `python scripts/check_source.py URL...`. Add `--terms` to also print every terms sentence about robots, scraping,
+automated access or copying. Those sentences must still be judged by a person or agent. A page that stops qualifying gets
+`enabled: false` in `config.yaml` (kept for the record), not deleted.
+
+**Re-scan 2026-11-24 (all 26 pages, `--terms`):** AOPA failed (general reproduction ban). SHPE, WAI, AMAC (commercial-use
+ban only) and ASCE (Library-scoped) were re-read and pass. The rest have no terms link on the page or homepage, as found in round 1.
 All checks below were made on **2026-11-24**. Re-check before re-enabling anything.
 
 ## Included (`sources.watchlist.pages` in `config.yaml`)
@@ -15,7 +20,7 @@ All checks below were made on **2026-11-24**. Re-check before re-enabling anythi
 | SWE, Vertical Flight Society, SHPE, Women in Aviation Intl | National | Original watchlist |
 | Texas Space Grant Consortium | State | Original watchlist |
 | Brooke Owens Fellowship | National | Page currently says "APPLICATION NOW CLOSED" |
-| AOPA Foundation, EAA, Ninety-Nines, Air & Space Forces Assn, Order of Daedalians, AEA Educational Foundation, AMAC Foundation | National | Aviation |
+| EAA, Ninety-Nines, Air & Space Forces Assn, Order of Daedalians, AEA Educational Foundation, AMAC Foundation | National | Aviation |
 | Udall Foundation | National | Federal |
 | ASCE | National | Copy restriction covers the ASCE Library only |
 | Tau Beta Pi, SFTE, AISES, SASE, NSPE Education Foundation | National | |
@@ -30,7 +35,7 @@ Northrop Grumman, ScholarshipOwl (bots/monitoring clause), IIE (runs Boren and G
 Blackbaud AcademicWorks (university portals such as utexas), AFCEA (scraping clause), Unigo, NSBE.
 
 ## Excluded: terms ban copying/reproduction of site content
-Terry Foundation, Fastweb, JLV College Counseling, DoSomething, ANS, GMiS, Astronaut Scholarship Foundation, ASME, AIAA.
+AOPA (found in the 2026-11-24 `--terms` re-scan; set `enabled: false` in config), Terry Foundation, Fastweb, JLV College Counseling, DoSomething, ANS, GMiS, Astronaut Scholarship Foundation, ASME, AIAA.
 
 ## Excluded: robots.txt disallows, or the server refuses bots (403/429)
 Bold.org (429 bot checkpoint), Niche (403), Goldwater (403), Communities Foundation of Texas (403),
