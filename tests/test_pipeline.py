@@ -66,6 +66,8 @@ def test_formula_injection_escaped(raw):
 def test_award_range():
     assert parse_award_range("$1,000 - $5,000") == (1000, 5000)
     assert parse_award_range("Varies") == (None, None)
+    assert parse_award_range("Up to $5,000") == (None, 5000)
+    assert parse_award_range("$5,000") == (5000, 5000)
 
 
 def test_deadline_parsing():
@@ -203,6 +205,10 @@ NOW = datetime(2026, 11, 24, tzinfo=timezone.utc)
     # "by" phrasing, incl. "p.m." inside the window (TBP, ASCE)
     ("When is the application deadline? The application must be submitted by 11:59 p.m. EDT April 1.", "2027-04-01T23:59:00Z"),
     ("Applications must be submitted online no later than January 15 of the year of award.", "2027-01-15T23:59:00Z"),
+    # membership / redemption dates are not application deadlines (Whirly-Girls, OBAP)
+    ("must have joined the Whirly-Girls no later than October 14, 2026 and have redeemed the scholarship no later than July 1, 2027.", ""),
+    ("must have been an active, dues-paying member no later than January 1st.", ""),
+    ("Members must submit applications no later than March 1, 2027.", "2027-03-01T23:59:00Z"),
 ])
 def test_extract_deadline(text, expected):
     assert extract_deadline(text, now=NOW)[0] == expected

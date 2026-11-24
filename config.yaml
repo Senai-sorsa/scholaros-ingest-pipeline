@@ -136,6 +136,21 @@ sources:
         url: "https://www.highered.texas.gov/state-financial-aid/"
         scope: "State"
         tags: [texas, state_aid]
+      # Round 2 (2026-11-24, check_source.py --terms): IISE terms are a disclaimer only; OBAP and NBAA have no
+      # terms page (privacy policy only, no access clause).
+      - title: "IISE Scholarships and Fellowships"
+        sponsor: "Institute of Industrial and Systems Engineers"
+        url: "https://www.iise.org/details.aspx?id=857"
+        award: "Up to $5,000"
+        tags: [industrial_engineering, engineering, membership_required]
+      - title: "OBAP Scholarships"
+        sponsor: "Organization of Black Aerospace Professionals"
+        url: "https://obap.org/scholarships/"
+        tags: [aviation, aerospace_engineering, black_students, membership_required]
+      - title: "NBAA Scholarships"
+        sponsor: "National Business Aviation Association"
+        url: "https://www.nbaa.org/professional-development/scholarships/"
+        tags: [aviation, business_aviation]
   # CareerOneStop is not accepting new API registrations (as of 2026-11); skips itself without credentials.
   careeronestop:
     enabled: true

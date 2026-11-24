@@ -31,6 +31,9 @@ WINDOW_RE = re.compile(
     rf"{GAP}{{0,30}}?(?P<date>{DATE}){RANGE_TAIL}",
     re.IGNORECASE,
 )
+# "joined ... no later than", "dues-paying member no later than", "redeemed ... no later than" are not application deadlines.
+NOT_APPLICATION_RE = re.compile(r"\b(?:join|member|redeem|complet|train|travel|attend|graduat|enroll)", re.IGNORECASE)
+APPLICATION_RE = re.compile(r"\b(?:appl|submit|nominat)", re.IGNORECASE)
 CLOSED_RE = re.compile(r"\b(?:scholarships?|applications?)\s+(?:are|is)\s+(?:now\s+)?closed\b", re.IGNORECASE)
 
 
@@ -40,6 +43,9 @@ def extract_deadline(text: str, now: datetime | None = None) -> tuple[str, str]:
     found: list[tuple[datetime, str]] = []
     matches = [*DEADLINE_RE.finditer(text or ""), *WINDOW_RE.finditer(text or "")]
     for m in matches:
+        before = (text or "")[max(0, m.start() - 30): m.start()]
+        if NOT_APPLICATION_RE.search(before) and not APPLICATION_RE.search(before + m.group(0)[:40]):
+            continue
         raw = m.group("end") or m.group("date")
         has_year = re.search(r"20\d{2}", raw)
         if not has_year and m.group("year"):

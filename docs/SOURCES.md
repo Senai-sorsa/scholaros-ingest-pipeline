@@ -27,6 +27,7 @@ All checks below were made on **2026-11-24**. Re-check before re-enabling anythi
 | SME Education Foundation (`scholarships.smeef.org`) | National | Store-scoped copy restriction only |
 | Texas A&M Aero, Texas Tech COE, Rice Engineering, UH Cullen | Institutional | Only open to that school's students |
 | THECB state financial aid | State | |
+| IISE, OBAP, NBAA | National | Round 2 (2026-11-24). IISE's terms are a disclaimer only. OBAP and NBAA have a privacy policy only, with no access clause. NBAA's terms were readable once robots.txt and the redirect to `nbaa.org` were followed. |
 
 ## Excluded: terms prohibit automated access
 Dell Scholars, RodeoHouston, Austin Community Foundation, Dallas Foundation, Appily, Scholarships360,
@@ -42,6 +43,7 @@ Bold.org (429 bot checkpoint), Niche (403), Goldwater (403), Communities Foundat
 Truman Foundation (robots disallow), Gilman (403), NOAA Hollings (403), UT Austin Cockrell (robots disallow),
 Space Foundation (403), Women in Aerospace (429), AIChE, oSTEM, AMS, TSPE, ASEE, Lockheed Martin,
 scholarships.com, studentscholarships.org (all 403 to the audit fetcher).
+Round 2: AFROTC and SNAME (robots disallow), ASHRAE and AAUW (403).
 
 Bold, Unigo and Niche can only be added with written permission. See `docs/PERMISSION_REQUEST.md`.
 
@@ -52,7 +54,9 @@ Bold, Unigo and Niche can only be added with written permission. See `docs/PERMI
 | BigFuture (College Board) | No terms found at the expected location; needs a manual check |
 | GoingMerry | DNS failure |
 | SMART (DoD) | JavaScript-only page, no static content |
-| NBAA | Terms unreadable |
+| SPIE | JavaScript-only page |
+| Whirly-Girls | Members-only scholarships; the only dates on the page are membership/redemption dates |
+| NGPA, AWS Foundation, UNT, PAMA, AUVSI | Guessed URLs returned 404; correct pages still to be found |
 | Texas Business Hall of Fame | Empty page |
 | UT Arlington | No scholarship page found |
 | Isakowitz Fellowship, Patti Grace Smith Fellowship | Domains not found |

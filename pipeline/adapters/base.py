@@ -14,6 +14,8 @@ def parse_award_range(text: str) -> tuple[int | None, int | None]:
     matches = [int(m.replace(",", "")) for m in MONEY_RE.findall(text or "")]
     if not matches:
         return None, None
+    if len(matches) == 1 and re.search(r"\bup\s+to\b", text, re.IGNORECASE):
+        return None, matches[0]  # "Up to $5,000": the minimum is unknown, not $5,000
     return min(matches), max(matches)
 
 
