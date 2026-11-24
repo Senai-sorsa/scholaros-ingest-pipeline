@@ -14,7 +14,9 @@ from pipeline.models import StagedScholarship
 logger = logging.getLogger(__name__)
 
 MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?"
-DATE = rf"(?:{MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+20\d{{2}})?|\d{{1,2}}/\d{{1,2}}/20\d{{2}})"
+# Day-first ("5 October 2026", AIST) needs the year, else "5 October 2026" was read as "October 20".
+DATE = (rf"(?:\d{{1,2}}\s+{MONTH}\s+20\d{{2}}|{MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+20\d{{2}})?"
+        rf"|\d{{1,2}}/\d{{1,2}}/20\d{{2}})")
 # A window's end date is the deadline: "October 1 - December 31", "December 1 to April 30", "open on Dec 15 and close on Apr 30".
 RANGE_TAIL = rf"\s*(?:-|–|—|to|through|thru|until|and\s+close[sd]?(?:\s+on)?)\s*(?P<end>{DATE})"
 GAP = r"(?:[^.]|[ap]\.m\.|\b[A-Z][a-z]{0,3}\.)"  # window text may contain "11:59 p.m." or "Feb." but no sentence end

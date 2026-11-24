@@ -161,6 +161,16 @@ sources:
         url: "https://engineering.unt.edu/support/scholarships"
         scope: "Institutional"
         tags: [engineering, texas, unt_students]
+      # Round 4 (2026-11-24): AIST has no terms anywhere (homepage checked); CAP legal statement has no access/copy clause.
+      - title: "AIST Foundation Steel Intern Scholarships"
+        sponsor: "AIST Foundation"
+        url: "https://www.aist.org/Students-Faculty/Scholarships/Steel-Intern-Scholarships"
+        award: "$7,500 - $12,000"
+        tags: [engineering, materials_engineering, internship, undergraduate]
+      - title: "Civil Air Patrol Cadet Scholarships"
+        sponsor: "Civil Air Patrol"
+        url: "https://www.gocivilairpatrol.com/programs/cadets/cadetinvest/scholarships"
+        tags: [aviation, aerospace_engineering, flight_training, cap_cadets]
   # CareerOneStop is not accepting new API registrations (as of 2026-11); skips itself without credentials.
   careeronestop:
     enabled: true

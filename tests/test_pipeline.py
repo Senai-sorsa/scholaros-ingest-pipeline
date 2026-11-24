@@ -209,6 +209,8 @@ NOW = datetime(2026, 11, 24, tzinfo=timezone.utc)
     ("must have joined the Whirly-Girls no later than October 14, 2026 and have redeemed the scholarship no later than July 1, 2027.", ""),
     ("must have been an active, dues-paying member no later than January 1st.", ""),
     ("Members must submit applications no later than March 1, 2027.", "2027-03-01T23:59:00Z"),
+    # day-first dates (AIST) used to be read as "October 20"
+    ("Completed applications should be submitted by 5 October 2026. Recipients announced mid-December.", "2026-10-05T23:59:00Z"),
 ])
 def test_extract_deadline(text, expected):
     assert extract_deadline(text, now=NOW)[0] == expected

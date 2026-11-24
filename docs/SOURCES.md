@@ -30,12 +30,15 @@ All checks below were made on **2026-11-24**. Re-check before re-enabling anythi
 | IISE, OBAP, NBAA | National | Round 2 (2026-11-24). IISE's terms are a disclaimer only. OBAP and NBAA have a privacy policy only, with no access clause. NBAA's terms were readable once robots.txt and the redirect to `nbaa.org` were followed. |
 | AWS Foundation | National | Round 3. Terms have no access/copy clause (12 flags, all nav/billing noise) |
 | UNT College of Engineering | Institutional | Round 3. `unt.edu/disclaimer.html` has no clause |
+| AIST Foundation | National | Round 4. No terms anywhere on aist.org (homepage footer checked) |
+| Civil Air Patrol | National | Round 4. `legal-privacy-statement` has no access/copy clause. Cadets only |
 
 ## Excluded: terms prohibit automated access
 Dell Scholars, RodeoHouston, Austin Community Foundation, Dallas Foundation, Appily, Scholarships360,
 CollegeXpress, AccessScholarships, Scholarship America, Sallie Mae, Raise.me, SmarterSelect, HSF,
 Northrop Grumman, ScholarshipOwl (bots/monitoring clause), IIE (runs Boren and Gilman), AIP (hosts SPS),
 Blackbaud AcademicWorks (university portals such as utexas), AFCEA (scraping clause), Unigo, NSBE.
+Round 4: ASNT Foundation ("crawl"/"spider" ban), ACEC Research Institute (robot/spider/page-scrape ban).
 
 ## Excluded: terms ban copying/reproduction of site content
 AOPA (found in the 2026-11-24 `--terms` re-scan; set `enabled: false` in config), Terry Foundation, Fastweb, JLV College Counseling, DoSomething, ANS, GMiS, Astronaut Scholarship Foundation, ASME, AIAA.
@@ -45,7 +48,7 @@ Bold.org (429 bot checkpoint), Niche (403), Goldwater (403), Communities Foundat
 Truman Foundation (robots disallow), Gilman (403), NOAA Hollings (403), UT Austin Cockrell (robots disallow),
 Space Foundation (403), Women in Aerospace (429), AIChE, oSTEM, AMS, TSPE, ASEE, Lockheed Martin,
 scholarships.com, studentscholarships.org (all 403 to the audit fetcher).
-Round 2: AFROTC and SNAME (robots disallow), ASHRAE and AAUW (403).
+Round 2: AFROTC and SNAME (robots disallow), ASHRAE and AAUW (403). Round 4: ASM Materials Education Foundation and UTSA CEID (`ceid.utsa.edu`) (403).
 
 Bold, Unigo and Niche can only be added with written permission. See `docs/PERMISSION_REQUEST.md`.
 
@@ -61,6 +64,10 @@ Bold, Unigo and Niche can only be added with written permission. See `docs/PERMI
 | NGPA | `ngpa.org/scholarships` allowed by robots, but the only policy page (`/portal_pp`) is a members-portal stub and the page has no static dates |
 | PAMA | Terms allow use "solely for your personal use" and nothing else without written permission. This pipeline is personal use, but it is excluded to stay conservative (ASK_LATER A-6) |
 | AUVSI | No AUVSI-run scholarship page found; the Elevate scholarship is run by NCAT |
+| UT Dallas Jonsson School | Page allowed, no terms; only date is Oct 20, 2024 (stale). Revisit |
+| UTSA Klesse, Texas State Ingram | No scholarship page linked from the college sites (scholarships live in AcademicWorks, which is excluded) |
+| DoD SMART (`smartscholarship.org`) | Still a JavaScript-only page (120 chars). Deadline is about Dec 4, 2026 per third parties |
+| SAME San Antonio Post (`same.secure-platform.com`) | No terms link; 2026 cycle closed Sep 25. Revisit when the national SAME terms are checked |
 | Texas Business Hall of Fame | Empty page |
 | UT Arlington | No scholarship page found |
 | Isakowitz Fellowship, Patti Grace Smith Fellowship | Domains not found |
