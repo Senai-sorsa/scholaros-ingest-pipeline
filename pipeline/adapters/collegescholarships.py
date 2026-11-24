@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 
@@ -17,14 +19,15 @@ logger = logging.getLogger(__name__)
 class CollegeScholarshipsAdapter(BaseAdapter):
     """CollegeScholarships.org database (~23k awards, 30 per listing page). Checked 2026-11-24: robots.txt allows
     /financial-aid?page=N and the site has no Terms of Use (privacy policy only, no access/copy clause).
-    Reads listing pages only (one request per 30 awards) and keeps the awards that fit the profile in config."""
+    Reads listing pages (one request per 30 awards) and keeps the awards that fit the profile in config. Each match's
+    page is opened once, ever, for its sponsor (other colleges' own awards are dropped by sponsor); sponsors are kept in
+    sponsor_cache_path. A match whose sponsor is not known yet and is over this run's budget waits for a later run."""
 
     name = "collegescholarships"
     BASE = "https://www.collegescholarships.org/financial-aid/"
 
     def fetch(self) -> list[StagedScholarship]:
         cfg = self.config
-        max_pages = int(cfg.get("max_pages_per_run", 200))
         states = re.compile(cfg.get("allowed_states_regex", r"no geographic restrictions"), re.I)
         levels = re.compile(cfg.get("allowed_levels_regex", r"no restrictions|college"), re.I)
         majors = re.compile(cfg.get("allowed_majors_regex", r"all majors"), re.I)
@@ -32,7 +35,21 @@ class CollegeScholarshipsAdapter(BaseAdapter):
         # The listing has no sponsor name; the detail page does. Awards run by another college are dropped there.
         sponsor_exclude = re.compile(cfg.get("sponsor_exclude_regex", r"universit|college"), re.I)
         detail_budget = int(cfg.get("max_detail_fetches_per_run", 200))
+        self._cache_path = Path(cfg.get("sponsor_cache_path", "data/collegescholarships_sponsors.json"))
+        cache: dict[str, str] = json.loads(self._cache_path.read_text(encoding="utf-8")) if self._cache_path.exists() else {}
+        cached_before = len(cache)
+        try:
+            return self._fetch(cfg, states, levels, majors, exclude, sponsor_exclude, detail_budget, cache)
+        finally:
+            if len(cache) > cached_before:
+                self._save(cache)
 
+    def _save(self, cache: dict[str, str]) -> None:
+        self._cache_path.parent.mkdir(parents=True, exist_ok=True)
+        self._cache_path.write_text(json.dumps(cache, indent=0, sort_keys=True), encoding="utf-8")
+
+    def _fetch(self, cfg, states, levels, majors, exclude, sponsor_exclude, detail_budget, cache) -> list[StagedScholarship]:
+        max_pages = int(cfg.get("max_pages_per_run", 200))
         first = self._get(self.BASE)
         if first is None:
             return []
@@ -42,10 +59,8 @@ class CollegeScholarshipsAdapter(BaseAdapter):
         pages = [((start - 1 + i) % total) + 1 for i in range(min(max_pages, total))]
 
         results: list[StagedScholarship] = []
-        seen = read_pages = 0
+        seen = read_pages = waiting = 0
         for n in pages:
-            if detail_budget <= 0:
-                break  # keeps run time bounded; the rest of the database comes up in later weeks
             html = first if n == 1 else self._get(f"{self.BASE}?page={n}")
             if html is None:
                 break  # compliance stop or site error: don't keep hammering
@@ -56,17 +71,23 @@ class CollegeScholarshipsAdapter(BaseAdapter):
                 text = f"{item['title']} {item['description']}"
                 if not (states.search(state) and levels.search(level) and majors.search(major)) or exclude.search(text):
                     continue
-                if detail_budget <= 0:
-                    break
-                detail_budget -= 1
-                try:
-                    sponsor = parse_sponsor(self.client.get(item["url"]).text)
-                except ComplianceBlockedError as exc:
-                    logger.warning("[collegescholarships] Compliance stop: %s", exc)
-                    return results  # no more requests to this site this run
-                except Exception as exc:
-                    logger.warning("[collegescholarships] Skipping %s: %s", item["url"], exc)
-                    continue  # e.g. one dead detail page
+                key = item["url"].rstrip("/").rsplit("/", 1)[-1]
+                if key not in cache:
+                    if detail_budget <= 0:
+                        waiting += 1  # sponsor unknown: picked up in a later run rather than staged unchecked
+                        continue
+                    detail_budget -= 1
+                    try:
+                        cache[key] = parse_sponsor(self.client.get(item["url"]).text)
+                        if len(cache) % 100 == 0:
+                            self._save(cache)  # long runs keep their progress if interrupted
+                    except ComplianceBlockedError as exc:
+                        logger.warning("[collegescholarships] Compliance stop: %s", exc)
+                        return results  # no more requests to this site this run
+                    except Exception as exc:
+                        logger.warning("[collegescholarships] Skipping %s: %s", item["url"], exc)
+                        continue  # e.g. one dead detail page
+                sponsor = cache[key]
                 if sponsor_exclude.search(sponsor):
                     continue
                 award_min, award_max = parse_award_range(item["award"])
@@ -86,7 +107,8 @@ class CollegeScholarshipsAdapter(BaseAdapter):
                     review_notes=f"auto: collegescholarships.org listing; {item['description'][:200]}",
                     raw_snippet_for_filter=f"{text} {level}",
                 ))
-        logger.info("[collegescholarships] %d pages, %d awards read, %d kept for profile.", read_pages, seen, len(results))
+        logger.info("[collegescholarships] %d pages, %d awards read, %d kept for profile, %d matches waiting for a "
+                    "sponsor lookup in a later run (%d sponsors known).", read_pages, seen, len(results), waiting, len(cache))
         return results
 
     def _get(self, url: str) -> str | None:

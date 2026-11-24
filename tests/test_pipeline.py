@@ -284,9 +284,10 @@ def test_cs_parse_listing():
                         "major": "Aerospace Engineering"}
 
 
-def test_cs_adapter_filters_profile_and_visits_every_page_once():
+def test_cs_adapter_filters_profile_and_visits_every_page_once(tmp_path):
     import yaml
     cfg = yaml.safe_load(open("config.yaml", encoding="utf-8"))["sources"]["collegescholarships"]
+    cfg["sponsor_cache_path"] = str(tmp_path / "sponsors.json")
     visited = []
 
     def handler(request):
@@ -300,15 +301,23 @@ def test_cs_adapter_filters_profile_and_visits_every_page_once():
         return httpx.Response(200, text=CS_PAGE)
 
     details = []
-    items = CollegeScholarshipsAdapter(client=_client(handler), config=cfg).fetch()
+    items = CollegeScholarshipsAdapter(client=_client(handler), config=dict(cfg, max_detail_fetches_per_run=200)).fetch()
     assert sorted(visited) == ["1", "2", "3"]  # page count read from the pagination links; capped by total
     assert sorted(set(details)) == ["adams", "aero", "tx"]  # detail pages only for listing matches
     assert {i.title for i in items} == {"Aero Award", "Texas Any Major"}  # Adams State's own award dropped by sponsor
     aero = next(i for i in items if i.title == "Aero Award")
     assert (aero.award_min_usd, aero.award_max_usd, aero.source_type, aero.sponsor) == (2500, 2500, "Aggregator", "Aero Foundation, Inc.")
+    assert sorted(details) == ["adams", "aero", "tx"]  # each sponsor looked up once; pages 2-3 hit the cache
+    details.clear(); visited.clear()
+    again = CollegeScholarshipsAdapter(client=_client(handler), config=dict(cfg, max_detail_fetches_per_run=0)).fetch()
+    assert details == [] and sorted(visited) == ["1", "2", "3"]  # next run: sponsors come from the saved cache
+    assert {i.title for i in again} == {"Aero Award", "Texas Any Major"}
+    cold = dict(cfg, sponsor_cache_path=str(tmp_path / "empty.json"))
     details.clear()
-    CollegeScholarshipsAdapter(client=_client(handler), config=dict(cfg, max_detail_fetches_per_run=2)).fetch()
+    CollegeScholarshipsAdapter(client=_client(handler), config=dict(cold, max_detail_fetches_per_run=2)).fetch()
     assert details == ["aero", "tx"]  # stops once the detail budget is spent
+    details.clear()
+    assert {i.title for i in CollegeScholarshipsAdapter(client=_client(handler), config=dict(cold, max_detail_fetches_per_run=0)).fetch()} == {"Aero Award", "Texas Any Major"}  # adams still unknown: waits, not staged
     assert aero.deadline_utc_iso.endswith("-03-01T23:59:00Z")
     tx = next(i for i in items if i.title == "Texas Any Major")
     assert (tx.award_max_usd, tx.deadline_utc_iso, tx.competition_scope) == (None, "", "State")

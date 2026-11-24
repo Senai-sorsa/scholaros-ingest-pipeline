@@ -23,7 +23,7 @@ concurrency:
 jobs:
   ingest:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 100  # full CollegeScholarships.org pass (~50 min) + up to 300 sponsor lookups (~20 min)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,6 +41,13 @@ jobs:
         run: |
           pip install pytest
           python -m pytest -q
+
+      - name: Restore CollegeScholarships.org sponsor cache
+        uses: actions/cache@v4
+        with:
+          path: data/collegescholarships_sponsors.json
+          key: cs-sponsors-${{ github.run_id }}
+          restore-keys: cs-sponsors-
 
       - name: Run compliant scholarship ingest
         env:
