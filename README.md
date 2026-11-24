@@ -3,7 +3,8 @@
 A compliant, fact-only scholarship ingestion pipeline that runs automatically on GitHub Actions every Sunday at **6:00 AM CST** (`12:00 UTC`), writes clean deduplicated rows into the `Ingest_Staging` tab of **ScholarOS — Shared Scholarship Hub**, and hands off directly to your Sunday **8:00 AM CST** Gemini `/scholarshipsearch` scheduled run.
 
 ## Compliance status
-- **CareerOneStop (U.S. Dept. of Labor API)**: enabled. This is the official, permitted source. It needs free API credentials.
+- **Watchlist (main source)**: a curated list of official sponsor pages in `config.yaml` (`sources.watchlist.pages`). Each page was checked: robots.txt allows it and the site's Terms of Use have no clause against automated access. The pipeline makes one request per page per week and stores only facts (title, sponsor, deadline, amount, URL). To add a page, check its Terms first.
+- **CareerOneStop (U.S. Dept. of Labor API)**: not accepting new API registrations (as of Nov 2026). It skips itself when no credentials are set.
 - **Bold.org, Unigo, Niche**: **disabled**. Unigo's Terms of Use prohibit "any automatic device, process or means" to access or copy the site, and Bold.org (bot checkpoint, HTTP 429) and Niche (HTTP 403) actively block bots. Do not re-enable them without written permission.
 - The HTTP client obeys robots.txt (including `Crawl-delay`). It treats an unreachable or access-restricted robots.txt as "disallow", and it stops contacting a domain for the rest of the run after a 403/429.
 - See `CLAUDE.md` for the rules any AI assistant must follow in this repo.
@@ -25,7 +26,7 @@ A compliant, fact-only scholarship ingestion pipeline that runs automatically on
 In your GitHub repo, go to **Settings → Secrets and variables → Actions → New repository secret** and add:
 - `SCHOLAROS_SHEET_ID`: The ID from your ScholarOS Google Sheet URL (`https://docs.google.com/spreadsheets/d/<THIS_PART>/edit`).
 - `GOOGLE_SERVICE_ACCOUNT_JSON`: The entire raw contents of the service account `.json` key file.
-- *(Optional, recommended)* `CAREERONESTOP_USER_ID` and `CAREERONESTOP_API_TOKEN`: Free official U.S. Dept. of Labor Scholarship API credentials from https://www.careeronestop.org/Developers/WebAPI/registration.aspx.
+- *(Optional, only if you already have them)* `CAREERONESTOP_USER_ID` and `CAREERONESTOP_API_TOKEN`. CareerOneStop is not accepting new registrations right now.
 
 ### Step 4: Test It Immediately
 Go to the **Actions** tab in GitHub → **Weekly ScholarOS Ingest Pipeline** → **Run workflow**. Check the `Ingest_Staging` tab in ScholarOS to verify new rows appear.

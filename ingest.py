@@ -9,6 +9,7 @@ import yaml
 
 from pipeline.adapters.careeronestop import CareerOneStopAdapter
 from pipeline.adapters.public_aggregators import BoldAdapter, NicheAdapter, UnigoAdapter
+from pipeline.adapters.watchlist import WatchlistAdapter
 from pipeline.compliance import CompliantHttpClient
 from pipeline.filters import filter_and_deduplicate
 from pipeline.models import StagedScholarship
@@ -25,6 +26,7 @@ ADAPTER_MAP = {
     "bold": BoldAdapter,
     "unigo": UnigoAdapter,
     "niche": NicheAdapter,
+    "watchlist": WatchlistAdapter,
 }
 
 

@@ -157,3 +157,50 @@ def test_crawl_delay_is_honored(monkeypatch):
     c.get("https://x.org/a")
     c.get("https://x.org/b")
     assert slept and slept[0] > 4
+
+
+# --- watchlist adapter (patterns taken from real sponsor pages) ---
+from pipeline.adapters.watchlist import WatchlistAdapter, extract_deadline  # noqa: E402
+
+NOW = datetime(2026, 11, 24, tzinfo=timezone.utc)
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("Open date: December 1, 2026 Deadline: February 1, 2027 Interest Form", "2027-02-01T23:59:00Z"),  # SWE
+    ("contributors. 2027 Deadline: Feb. 1 \"By empowering", "2027-02-01T23:59:00Z"),  # VFS, year before keyword
+    ("Application opens: February 2, 2026 Application closes: February 16, 2026", "2026-02-16T23:59:00Z"),  # SHPE (past)
+    ("Deadline: March 3", "2027-03-03T23:59:00Z"),  # yearless & past -> next cycle
+    ("Applications due 1/15/2027.", "2027-01-15T23:59:00Z"),
+    ("Applications open 8/31. Learn more", ""),  # open date is not a deadline
+])
+def test_extract_deadline(text, expected):
+    assert extract_deadline(text, now=NOW)[0] == expected
+
+
+def test_extract_deadline_prefers_next_future():
+    text = "Deadline: February 1, 2026 ... Deadline: February 1, 2027 ... Deadline: March 31, 2027"
+    assert extract_deadline(text, now=NOW)[0] == "2027-02-01T23:59:00Z"
+
+
+def test_watchlist_adapter_builds_record_and_skips_blocked():
+    html = "<html><body><h1>VFF</h1><p>2099 Deadline: Feb. 1</p><p>Applications are closed</p></body></html>"
+
+    def handler(request):
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if request.url.host == "blocked.org":
+            return httpx.Response(403)
+        return httpx.Response(200, text=html)
+
+    pages = [
+        {"title": "VFF", "sponsor": "VFS", "url": "https://ok.org/vff", "award": "$4,000 - $6,000", "tags": ["aero"]},
+        {"title": "Blocked", "url": "https://blocked.org/x"},
+        {"title": "", "url": "https://ok.org/missing-title"},
+    ]
+    items = WatchlistAdapter(client=_client(handler), config={"pages": pages}).fetch()
+    assert len(items) == 1
+    item = items[0]
+    assert (item.deadline_utc_iso, item.award_min_usd, item.award_max_usd) == ("2099-02-01T23:59:00Z", 4000, 6000)
+    assert item.source_type == "Primary" and "closed" in item.review_notes
+    accepted, _ = run(items)
+    assert len(accepted) == 1 and len(accepted[0].to_sheet_row()) == 20
