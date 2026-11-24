@@ -151,6 +151,16 @@ sources:
         sponsor: "National Business Aviation Association"
         url: "https://www.nbaa.org/professional-development/scholarships/"
         tags: [aviation, business_aviation]
+      # Round 3 (2026-11-24): AWS terms (43k chars) have no access/copy clause; UNT disclaimer has none either.
+      - title: "AWS Foundation Welding Scholarships"
+        sponsor: "American Welding Society Foundation"
+        url: "https://www.aws.org/scholarships"
+        tags: [welding, welding_engineering, engineering]
+      - title: "UNT College of Engineering Scholarships"
+        sponsor: "University of North Texas"
+        url: "https://engineering.unt.edu/support/scholarships"
+        scope: "Institutional"
+        tags: [engineering, texas, unt_students]
   # CareerOneStop is not accepting new API registrations (as of 2026-11); skips itself without credentials.
   careeronestop:
     enabled: true

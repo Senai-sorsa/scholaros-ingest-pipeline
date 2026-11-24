@@ -28,3 +28,6 @@ The agent kept working on each item's stated assumption. Answer whenever conveni
 2. Share the ScholarOS sheet with the service account's email as **Editor**.
 3. GitHub repo, Settings, Secrets, Actions: add `SCHOLAROS_SHEET_ID` and `GOOGLE_SERVICE_ACCOUNT_JSON`.
 4. Actions tab, Weekly ScholarOS Ingest Pipeline, Run workflow with `dry_run: true`, then once more without it.
+
+## A-6: PAMA (personal-use-only terms)
+`pama.org/terms-of-use.html` lets you use content "solely for your personal use". This pipeline feeds your personal tracker, so it arguably qualifies, but I left PAMA out to be safe. PAMA's scholarship page currently shows "Deadline: December 15, 2026" (aviation maintenance). Say "add PAMA" if you're comfortable with it.

@@ -28,6 +28,8 @@ All checks below were made on **2026-11-24**. Re-check before re-enabling anythi
 | Texas A&M Aero, Texas Tech COE, Rice Engineering, UH Cullen | Institutional | Only open to that school's students |
 | THECB state financial aid | State | |
 | IISE, OBAP, NBAA | National | Round 2 (2026-11-24). IISE's terms are a disclaimer only. OBAP and NBAA have a privacy policy only, with no access clause. NBAA's terms were readable once robots.txt and the redirect to `nbaa.org` were followed. |
+| AWS Foundation | National | Round 3. Terms have no access/copy clause (12 flags, all nav/billing noise) |
+| UNT College of Engineering | Institutional | Round 3. `unt.edu/disclaimer.html` has no clause |
 
 ## Excluded: terms prohibit automated access
 Dell Scholars, RodeoHouston, Austin Community Foundation, Dallas Foundation, Appily, Scholarships360,
@@ -56,7 +58,9 @@ Bold, Unigo and Niche can only be added with written permission. See `docs/PERMI
 | SMART (DoD) | JavaScript-only page, no static content |
 | SPIE | JavaScript-only page |
 | Whirly-Girls | Members-only scholarships; the only dates on the page are membership/redemption dates |
-| NGPA, AWS Foundation, UNT, PAMA, AUVSI | Guessed URLs returned 404; correct pages still to be found |
+| NGPA | `ngpa.org/scholarships` allowed by robots, but the only policy page (`/portal_pp`) is a members-portal stub and the page has no static dates |
+| PAMA | Terms allow use "solely for your personal use" and nothing else without written permission. This pipeline is personal use, but it is excluded to stay conservative (ASK_LATER A-6) |
+| AUVSI | No AUVSI-run scholarship page found; the Elevate scholarship is run by NCAT |
 | Texas Business Hall of Fame | Empty page |
 | UT Arlington | No scholarship page found |
 | Isakowitz Fellowship, Patti Grace Smith Fellowship | Domains not found |
