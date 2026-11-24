@@ -100,6 +100,8 @@ def main() -> None:
     )
 
     logger.info("Filter-Before-Write complete: %d accepted, %d rejected.", len(accepted), len(rejected))
+    for item, reason in rejected:
+        logger.info("  rejected [%s] %s (%s): %s", item.source_adapter, item.title, item.raw_source_url, reason)
     backups = export_local_backups(accepted, export_xlsx=args.export_xlsx)
     for b in backups:
         logger.info("Saved local backup: %s", b)

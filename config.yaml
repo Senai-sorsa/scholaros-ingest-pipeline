@@ -8,9 +8,8 @@ compliance:
 
 sources:
   # Curated primary-source pages. Each was checked (2026-11-24): robots.txt allows the page AND the site's
-  # Terms of Use contain no clause against automated access. Re-check terms before adding a new page.
-  # Excluded on purpose: NSBE (ToS bans robots/data mining), ASME & AIAA (ToS forbid reproducing content),
-  # SMART / Brooke Owens / AFCEA (terms not verifiable yet), Goldwater (returns 403 to bots).
+  # Terms of Use contain no clause against automated access (or the site has no terms). Full audit with
+  # every verdict and reason: docs/SOURCES.md. Re-check terms before adding a page: scripts/check_source.py.
   watchlist:
     enabled: true
     pages:
@@ -36,6 +35,104 @@ sources:
         sponsor: "Women in Aviation International"
         url: "https://www.wai.org/scholarships"
         tags: [aviation, aerospace_engineering]
+      - title: "Brooke Owens Fellowship"
+        sponsor: "Brooke Owens Fellowship"
+        url: "https://brookeowensfellowship.org/apply"
+        tags: [aerospace_engineering, fellowship, internship, women]
+      - title: "AOPA Flight Training Scholarships"
+        sponsor: "AOPA Foundation"
+        url: "https://www.aopa.org/training-and-safety/students/aopa-flight-training-scholarships"
+        award: "$250 - $14,000"
+        tags: [aviation, flight_training]
+      - title: "EAA Flight Training Scholarships"
+        sponsor: "Experimental Aircraft Association"
+        url: "https://www.eaa.org/eaa/learn-to-fly/Scholarships"
+        tags: [aviation, flight_training]
+      - title: "Ninety-Nines Scholarships"
+        sponsor: "The Ninety-Nines"
+        url: "https://ninety-nines.org/scholarships/"
+        tags: [aviation, women]
+      - title: "Air & Space Forces Association Scholarships"
+        sponsor: "Air & Space Forces Association"
+        url: "https://www.afa.org/scholarships/"
+        tags: [aerospace_engineering, stem, undergraduate]
+      - title: "Order of Daedalians Scholarships"
+        sponsor: "Order of Daedalians"
+        url: "https://www.daedalians.org/scholarships/"
+        award: "$1,000 - $3,000"
+        tags: [aviation, military_aviation]
+      - title: "AEA Educational Foundation Scholarships"
+        sponsor: "Aircraft Electronics Association"
+        url: "https://www.aea.net/educationalfoundation/scholarships.asp"
+        award: "$1,000 - $5,000"
+        tags: [aviation, avionics, undergraduate]
+      - title: "AMAC Foundation Scholarships"
+        sponsor: "Airport Minority Advisory Council"
+        url: "https://www.amac-org.com/scholarships-archive/"
+        tags: [aviation, minority]
+      - title: "Udall Undergraduate Scholarship"
+        sponsor: "Udall Foundation"
+        url: "https://www.udall.gov/OurPrograms/Scholarship/Scholarship"
+        award: "$7,500"
+        tags: [environment, undergraduate]
+      - title: "ASCE Scholarships"
+        sponsor: "American Society of Civil Engineers"
+        url: "https://www.asce.org/career-growth/awards-and-honors/scholarships"
+        award: "$2,500 - $5,000"
+        tags: [civil_engineering, undergraduate, asce_members]
+      - title: "Tau Beta Pi Scholarships"
+        sponsor: "Tau Beta Pi"
+        url: "https://www.tbp.org/scholarships.cfm"
+        award: "$1,000 - $2,000"
+        tags: [engineering, honor_society_members]
+      - title: "SFTE Barbara Wood Scholarship"
+        sponsor: "Society of Flight Test Engineers"
+        url: "https://www.sfte.org/barbara_wood_scholarship.php"
+        tags: [aerospace_engineering, flight_test]
+      - title: "AISES Scholarships"
+        sponsor: "American Indian Science and Engineering Society"
+        url: "https://aises.org/scholarships/"
+        award: "$1,000 - $6,500"
+        tags: [stem, native_american, undergraduate]
+      - title: "SASE Scholarship"
+        sponsor: "Society of Asian Scientists and Engineers"
+        url: "https://main.saseconnect.org/scholarship"
+        award: "$5,000"
+        tags: [stem, asian_american, undergraduate]
+      - title: "NSPE Education Foundation Scholarships"
+        sponsor: "National Society of Professional Engineers"
+        url: "https://www.nspe.org/resources/education-foundation"
+        tags: [engineering, undergraduate]
+      - title: "SME Education Foundation Scholarships"
+        sponsor: "SME Education Foundation"
+        url: "https://scholarships.smeef.org/applications/"
+        award: "$2,500 - $20,000"
+        tags: [manufacturing_engineering, engineering, undergraduate]
+      - title: "Texas A&M Aerospace Engineering Scholarships"
+        sponsor: "Texas A&M University"
+        url: "https://engineering.tamu.edu/aerospace/advising/scholarships-and-aid/index.html"
+        scope: "Institutional"
+        tags: [aerospace_engineering, texas, tamu_students]
+      - title: "Texas Tech Engineering Scholarships"
+        sponsor: "Texas Tech University"
+        url: "https://www.depts.ttu.edu/coe/undergraduate/scholarships.php"
+        scope: "Institutional"
+        tags: [engineering, texas, ttu_students]
+      - title: "Rice Engineering Student Awards & Scholarships"
+        sponsor: "Rice University"
+        url: "https://engineering.rice.edu/academics/student-awards-scholarships"
+        scope: "Institutional"
+        tags: [engineering, texas, rice_students]
+      - title: "UH Cullen College of Engineering Scholarships"
+        sponsor: "University of Houston"
+        url: "https://www.egr.uh.edu/academics/scholarships"
+        scope: "Institutional"
+        tags: [engineering, texas, uh_students]
+      - title: "Texas State Financial Aid Programs"
+        sponsor: "Texas Higher Education Coordinating Board"
+        url: "https://www.highered.texas.gov/state-financial-aid/"
+        scope: "State"
+        tags: [texas, state_aid]
   # CareerOneStop is not accepting new API registrations (as of 2026-11); skips itself without credentials.
   careeronestop:
     enabled: true

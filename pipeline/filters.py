@@ -42,7 +42,7 @@ def filter_and_deduplicate(
             rejected.append((item, "missing_title_or_url"))
             continue
 
-        if item.canonical_url in seen_urls or item.fingerprint_sha16 in seen_fps:
+        if (item.dedup_by_url and item.canonical_url in seen_urls) or item.fingerprint_sha16 in seen_fps:
             rejected.append((item, "duplicate_existing_or_batch"))
             continue
 

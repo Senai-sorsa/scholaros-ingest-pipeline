@@ -107,6 +107,8 @@ class StagedScholarship:
     gemini_review_status: str = "Pending_Review"
     review_notes: str = ""
     raw_snippet_for_filter: str = ""  # In-memory only; never written to Sheets
+    # In-memory only. False for fixed pages (watchlist) that list a new cycle at the same URL: dedup by fingerprint only.
+    dedup_by_url: bool = True
 
     def finalize(self) -> "StagedScholarship":
         self.canonical_url = canonicalize_url(self.canonical_url or self.raw_source_url)

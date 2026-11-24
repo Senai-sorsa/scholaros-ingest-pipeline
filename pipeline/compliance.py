@@ -63,7 +63,8 @@ class CompliantHttpClient:
         robots_url = f"{origin}/robots.txt"
         rp = RobotFileParser()
         try:
-            resp = self._client.get(robots_url)
+            # robots.txt is text/plain; the default HTML Accept header gets 406 from some servers, hiding their rules.
+            resp = self._client.get(robots_url, headers={"Accept": "text/plain, */*;q=0.8"})
         except Exception as exc:
             # RFC 9309 §2.3.1.4: unreachable robots.txt means assume full disallow.
             logger.warning("Could not fetch robots.txt for %s (treating as disallow): %s", origin, exc)

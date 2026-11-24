@@ -3,8 +3,12 @@
 ## Hard rules
 1. **Never rename, reorder, add or remove columns in `STAGING_HEADERS` (`pipeline/models.py`).** The `Ingest_Staging` tab and Gemini's `/scholarshipsearch` Phase 2b reader depend on these exact 20 columns. `tests/test_pipeline.py::test_schema_is_locked` enforces this.
 2. **Only legally permitted sources.** A source may be added only if it is (a) an official API whose terms allow this use, or (b) a site whose robots.txt allows the path AND whose Terms of Use do not forbid automated access. Never add headless-browser, proxy, user-agent spoofing, CAPTCHA or bot-checkpoint workarounds. A 403/429 means "no", not "try harder".
-3. Bold, Unigo and Niche stay `enabled: false` (Unigo ToS bans automated access; Bold/Niche block bots). NSBE, ASME and AIAA are also excluded from the watchlist (their terms forbid robots or reproduction).
-4. The main source is `sources.watchlist.pages` in `config.yaml`. Add a page only after reading that site's Terms of Use, and record the check in the config comment.
+3. Bold, Unigo and Niche stay `enabled: false` (Unigo ToS bans automated access; Bold/Niche block bots). Only written permission can change this (`docs/PERMISSION_REQUEST.md`). Every other exclusion is listed in `docs/SOURCES.md`.
+4. The main source is `sources.watchlist.pages` in `config.yaml`. Add a page only after reading that site's Terms of Use and running `python scripts/check_source.py URL`. Record the verdict in `docs/SOURCES.md`.
+5. **Never add "Co-Authored-By: Claude" or any Claude/Anthropic attribution** to commits or PRs. Commit locally; pushing is the user's decision.
+
+## Autonomous mode
+When asked to work autonomously, follow `docs/agent/AUTOPILOT.md`: the work queue, the experiment log, and the don't-break-anything rules. Questions go in `docs/agent/ASK_LATER.md`.
 
 ## Workflow
 - Run `python -m pytest -q` before committing; CI runs it before every sheet write.

@@ -15,10 +15,20 @@ logger = logging.getLogger(__name__)
 
 MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?"
 DATE = rf"(?:{MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+20\d{{2}})?|\d{{1,2}}/\d{{1,2}}/20\d{{2}})"
-# "<keyword> ... <date>" within a short window, optionally preceded by a cycle year ("2027 Deadline: Feb. 1").
+# A window's end date is the deadline: "October 1 - December 31", "December 1 to April 30", "open on Dec 15 and close on Apr 30".
+RANGE_TAIL = rf"\s*(?:-|–|—|to|through|thru|until|and\s+close[sd]?(?:\s+on)?)\s*(?P<end>{DATE})"
+GAP = r"(?:[^.]|[ap]\.m\.|\b[A-Z][a-z]{0,3}\.)"  # window text may contain "11:59 p.m." or "Feb." but no sentence end
+# "<keyword> ... <date>[ - <end>]", optionally preceded by a cycle year ("2027 Deadline: Feb. 1").
 DEADLINE_RE = re.compile(
-    rf"(?:(?P<year>20\d{{2}})\s+)?(?:deadline|due date|applications?\s+(?:close[sd]?|due)|closes)"
-    rf"[^.]{{0,40}}?(?P<date>{DATE})",
+    rf"(?:(?P<year>20\d{{2}})\s+)?(?:deadline|due date|applications?\s+(?:close[sd]?|due)|closes|no later than"
+    rf"|submitted\s+(?:online\s+)?by|apply\s+by|due\s+(?:by|on))"
+    rf"{GAP}{{0,70}}?(?P<date>{DATE})(?:{RANGE_TAIL})?",
+    re.IGNORECASE,
+)
+# Application windows without a deadline keyword: "Applications are accepted December 1 to April 30".
+WINDOW_RE = re.compile(
+    rf"(?:(?P<year>20\d{{2}})\s+)?(?:open(?:s|ed)?|accepted|filed|period|window|available)"
+    rf"{GAP}{{0,30}}?(?P<date>{DATE}){RANGE_TAIL}",
     re.IGNORECASE,
 )
 CLOSED_RE = re.compile(r"\b(?:scholarships?|applications?)\s+(?:are|is)\s+(?:now\s+)?closed\b", re.IGNORECASE)
@@ -28,8 +38,9 @@ def extract_deadline(text: str, now: datetime | None = None) -> tuple[str, str]:
     """Return (deadline ISO, evidence snippet). Prefers the earliest future deadline, else the latest past one."""
     now = now or datetime.now(timezone.utc)
     found: list[tuple[datetime, str]] = []
-    for m in DEADLINE_RE.finditer(text or ""):
-        raw = m.group("date")
+    matches = [*DEADLINE_RE.finditer(text or ""), *WINDOW_RE.finditer(text or "")]
+    for m in matches:
+        raw = m.group("end") or m.group("date")
         has_year = re.search(r"20\d{2}", raw)
         if not has_year and m.group("year"):
             raw = f"{raw} {m.group('year')}"
@@ -91,6 +102,7 @@ class WatchlistAdapter(BaseAdapter):
                     eligibility_tags=list(page.get("tags", [])),
                     review_notes="; ".join(notes),
                     raw_snippet_for_filter=f"{page['title']} {page.get('sponsor', '')}",
+                    dedup_by_url=False,  # same page, new cycle each year
                 )
             )
         logger.info("[watchlist] Fetched %d raw candidates.", len(results))

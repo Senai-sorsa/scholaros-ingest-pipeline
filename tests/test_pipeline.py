@@ -103,6 +103,16 @@ def test_dedup_within_batch_and_against_sheet():
     assert not accepted
 
 
+def test_fixed_page_new_cycle_passes_url_dedup():
+    # A watchlist page keeps its URL every year: last cycle's row must not block this cycle's deadline.
+    last = make(deadline_utc_iso="", cycle_year=2026, dedup_by_url=False).finalize()
+    new = make(deadline_utc_iso=future(400), dedup_by_url=False)
+    accepted, _ = run([new], existing_urls={"https://acme.org/award"}, existing_fingerprints={last.fingerprint_sha16})
+    assert len(accepted) == 1
+    accepted, _ = run([make(dedup_by_url=False)], existing_fingerprints={make().finalize().fingerprint_sha16})
+    assert not accepted  # same cycle is still a duplicate
+
+
 def _client(handler, **kw):
     c = CompliantHttpClient(user_agent="TestBot/1.0", min_delay=0, max_delay=0, **kw)
     c._client = httpx.Client(transport=httpx.MockTransport(handler))
@@ -132,6 +142,18 @@ def test_restricted_or_failing_robots_means_disallow(status):
 
 def test_missing_robots_allows():
     assert _client(_robots(404)).get("https://x.org/page").text == "ok"
+
+
+def test_robots_requested_as_plain_text():
+    # Servers like smeef.org / ttu.edu answer 406 to an HTML-only Accept header, which used to hide their rules.
+    def handler(request):
+        if request.url.path == "/robots.txt":
+            if "text/plain" not in request.headers.get("accept", ""):
+                return httpx.Response(406)
+            return httpx.Response(200, text="User-agent: *\nDisallow: /private/")
+        return httpx.Response(200, text="ok")
+    with pytest.raises(ComplianceBlockedError):
+        _client(handler).get("https://x.org/private/page")
 
 
 def test_abort_status_blocks_domain_for_rest_of_run():
@@ -172,6 +194,15 @@ NOW = datetime(2026, 11, 24, tzinfo=timezone.utc)
     ("Deadline: March 3", "2027-03-03T23:59:00Z"),  # yearless & past -> next cycle
     ("Applications due 1/15/2027.", "2027-01-15T23:59:00Z"),
     ("Applications open 8/31. Learn more", ""),  # open date is not a deadline
+    # windows: the end date is the deadline (EAA, AFA, AISES, AOPA, UH)
+    ("Applications are open October 1 - December 16 of each year.", "2026-12-16T23:59:00Z"),
+    ("Applications are accepted December 1 to April 30 each year.", "2027-04-30T23:59:00Z"),
+    ("Scholarships open on December 15 and close on April 30 of each period.", "2027-04-30T23:59:00Z"),
+    ("Fall Application Period : October 1–December 31, 11:59 p.m. ET", "2026-12-31T23:59:00Z"),
+    ("Application Deadline: Applications may be filed February 16 – April 10, 2026.", "2026-04-10T23:59:00Z"),
+    # "by" phrasing, incl. "p.m." inside the window (TBP, ASCE)
+    ("When is the application deadline? The application must be submitted by 11:59 p.m. EDT April 1.", "2027-04-01T23:59:00Z"),
+    ("Applications must be submitted online no later than January 15 of the year of award.", "2027-01-15T23:59:00Z"),
 ])
 def test_extract_deadline(text, expected):
     assert extract_deadline(text, now=NOW)[0] == expected
